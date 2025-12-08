@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gestor profesional de películas con recomendaciones inteligentes">
+    <meta name="theme-color" content="#e50914">
+    <title>{% block title %}Gestor de Películas - Cine Online{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='static/css/style.css') }}">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' fill='%23e50914'>🎬</text></svg>">
+</head>
+<body>
+    <!-- HEADER / NAVBAR -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="navbar-container">
+                <!-- Logo -->
+                <div class="navbar-brand">
+                    <a href="/{{ subpath }}/" class="logo">
+                        <span class="logo-icon">🎬</span>
+                        <span class="logo-text">CinemaHub</span>
+                    </a>
+                </div>
+
+                <!-- Navigation Menu -->
+                <button class="navbar-toggle" id="navbarToggle" aria-label="Toggle navigation">
+                    <span class="hamburger"></span>
+                    <span class="hamburger"></span>
+                    <span class="hamburger"></span>
+                </button>
+
+                <ul class="navbar-menu" id="navbarMenu">
+                    <li class="nav-item">
+                        <a href="/{{ subpath }}/" class="nav-link">
+                            <i class="icon">🏠</i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/{{ subpath }}/search" class="nav-link">
+                            <i class="icon">🔍</i> Buscar
+                        </a>
+                    </li>
+                    {% if usuario %}
+                        <li class="nav-item">
+                            <a href="/{{ subpath }}/add" class="nav-link nav-link-accent">
+                                <i class="icon">➕</i> Añadir Película
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/{{ subpath }}/favoritos" class="nav-link">
+                                <i class="icon">❤️</i> Favoritos
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <button class="nav-link dropdown-toggle" id="userDropdown">
+                                <i class="icon">👤</i> {{ usuario }}
+                                <span class="dropdown-arrow">▼</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="/{{ subpath }}/logout" class="dropdown-item">
+                                        <i class="icon">🚪</i> Cerrar Sesión
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a href="/{{ subpath }}/login" class="nav-link nav-link-primary">
+                                <i class="icon">🔐</i> Iniciar Sesión
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/{{ subpath }}/register" class="nav-link">
+                                <i class="icon">✨</i> Registrarse
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Hero Section (only on homepage) -->
+        {% block hero %}{% endblock %}
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" role="main">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>Acerca de</h4>
+                    <p>CinemaHub es tu plataforma profesional para descubrir, guardar y compartir películas. Sistema de recomendaciones inteligente basado en géneros y puntuaciones.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Características</h4>
+                    <ul class="footer-links">
+                        <li><a href="/{{ subpath }}/">Catálogo Completo</a></li>
+                        <li><a href="/{{ subpath }}/search">Búsqueda Avanzada</a></li>
+                        <li><a href="/{{ subpath }}/favoritos">Mis Favoritos</a></li>
+                        <li><a href="/{{ subpath }}/">Recomendaciones</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Comunidad</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Blog de Cine</a></li>
+                        <li><a href="#">Foro de Debates</a></li>
+                        <li><a href="#">Críticas de Usuarios</a></li>
+                        <li><a href="#">Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Términos de Servicio</a></li>
+                        <li><a href="#">Privacidad</a></li>
+                        <li><a href="#">Cookies</a></li>
+                        <li><a href="#">Reportar Error</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 CinemaHub - Gestor Profesional de Películas. Todos los derechos reservados.</p>
+                <p class="footer-version">v1.0 | Desarrollado con Flask + SQLAlchemy</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Mobile Menu Toggle
+        const navbarToggle = document.getElementById('navbarToggle');
+        const navbarMenu = document.getElementById('navbarMenu');
+        const userDropdown = document.getElementById('userDropdown');
+
+        if (navbarToggle) {
+            navbarToggle.addEventListener('click', () => {
+                navbarMenu.classList.toggle('active');
+                navbarToggle.classList.toggle('active');
+            });
+        }
+
+        // User Dropdown
+        if (userDropdown) {
+            userDropdown.addEventListener('click', (e) => {
+                e.preventDefault();
+                const dropdown = userDropdown.parentElement;
+                dropdown.classList.toggle('open');
+            });
+
+            document.addEventListener('click', (e) => {
+                const dropdown = document.querySelector('.dropdown');
+                if (dropdown && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('open');
+                }
+            });
+        }
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href !== '#') {
+                    e.preventDefault();
+                    const element = document.querySelector(href);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

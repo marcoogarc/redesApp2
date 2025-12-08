@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}Añadir Nueva Película - CinemaHub{% endblock %}
+
+{% block content %}
+<section class="add-movie-section">
+    <div class="section-header">
+        <h2>Añadir Nueva Película</h2>
+        <p class="section-description">Contribuye al catálogo de CinemaHub con tus películas favoritas</p>
+    </div>
+
+    <div class="form-container add-movie-form">
+        {% if error %}
+        <div class="alert alert-error" role="alert">
+            <span class="alert-icon">⚠️</span>
+            <div class="alert-content">
+                <strong>Error al añadir película:</strong>
+                <p>{{ error }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <form method="POST" action="/{{ subpath }}/add" class="movie-form" id="addMovieForm">
+            <!-- Form Sections -->
+            <fieldset class="form-section">
+                <legend class="section-title">Información Básica</legend>
+                
+                <div class="form-group">
+                    <label for="title" class="form-label">
+                        <span class="label-text">Título de la Película</span>
+                        <span class="label-required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="title" 
+                        name="title" 
+                        class="form-input"
+                        placeholder="Ej: Inception, Pulp Fiction, The Shawshank Redemption"
+                        required
+                        minlength="2"
+                        maxlength="255"
+                    >
+                    <span class="form-help">Nombre completo de la película</span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="year" class="form-label">
+                            <span class="label-text">Año de Lanzamiento</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <input 
+                            type="number" 
+                            id="year" 
+                            name="year" 
+                            class="form-input"
+                            placeholder="2024"
+                            required
+                            min="1900"
+                            max="2100"
+                        >
+                        <span class="form-help">Año en que se lanzó la película</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="genre" class="form-label">
+                            <span class="label-text">Género</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <select id="genre" name="genre" class="form-select" required>
+                            <option value="">-- Selecciona un género --</option>
+                            <option value="Action">🎬 Action (Acción)</option>
+                            <option value="Drama">🎭 Drama</option>
+                            <option value="Sci-Fi">🚀 Sci-Fi (Ciencia Ficción)</option>
+                            <option value="Comedy">😂 Comedy (Comedia)</option>
+                            <option value="Horror">👻 Horror (Terror)</option>
+                            <option value="Thriller">😨 Thriller (Suspenso)</option>
+                            <option value="Romance">💕 Romance</option>
+                            <option value="Animation">🎨 Animation (Animación)</option>
+                        </select>
+                        <span class="form-help">Categoría principal de la película</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rating" class="form-label">
+                            <span class="label-text">Puntuación</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <div class="rating-input-wrapper">
+                            <input 
+                                type="number" 
+                                id="rating" 
+                                name="rating" 
+                                class="form-input rating-input"
+                                placeholder="8.5"
+                                required
+                                min="0"
+                                max="10"
+                                step="0.1"
+                            >
+                            <span class="rating-max">/10</span>
+                        </div>
+                        <span class="form-help">De 0 a 10 (con decimales)</span>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Description Section -->
+            <fieldset class="form-section">
+                <legend class="section-title">Descripción</legend>
+                
+                <div class="form-group">
+                    <label for="description" class="form-label">
+                        <span class="label-text">Sinopsis o Descripción</span>
+                        <span class="label-optional">(Opcional)</span>
+                    </label>
+                    <textarea 
+                        id="description" 
+                        name="description" 
+                        class="form-textarea"
+                        placeholder="Describe brevemente de qué trata la película... Puedes incluir: trama, personajes principales, por qué te gustó, etc."
+                        rows="6"
+                        maxlength="1000"
+                    ></textarea>
+                    <div class="form-help">
+                        <span id="charCount">0</span>/1000 caracteres
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Preview Section -->
+            <fieldset class="form-section">
+                <legend class="section-title">Vista Previa</legend>
+                
+                <div class="preview-card movie-card">
+                    <div class="movie-header">
+                        <div class="movie-rating">
+                            <span class="rating-value" id="previewRating">-</span>
+                            <span class="rating-star">⭐</span>
+                        </div>
+                        <span class="movie-genre-badge" id="previewGenre">-</span>
+                    </div>
+                    <div class="movie-body">
+                        <h3 class="movie-title" id="previewTitle">Tu película aquí</h3>
+                        <p class="movie-year" id="previewYear">📅 -</p>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-lg btn-primary">
+                    <span class="btn-icon">💾</span> Guardar Película
+                </button>
+                <a href="/{{ subpath }}/" class="btn btn-lg btn-secondary">
+                    <span class="btn-icon">❌</span> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Help Section -->
+    <section class="help-section">
+        <h3>Consejos para Añadir Películas</h3>
+        <div class="tips-grid">
+            <div class="tip">
+                <span class="tip-icon">📝</span>
+                <h4>Información Precisa</h4>
+                <p>Asegúrate de escribir el título exacto de la película y el año correcto de lanzamiento</p>
+            </div>
+            <div class="tip">
+                <span class="tip-icon">⭐</span>
+                <h4>Puntuación Justa</h4>
+                <p>Usa la escala de 0-10 para dar una puntuación honesta basada en tu experiencia</p>
+            </div>
+            <div class="tip">
+                <span class="tip-icon">🎯</span>
+                <h4>Género Correcto</h4>
+                <p>Elige el género principal de la película para mejorar las recomendaciones</p>
+            </div>
+            <div class="tip">
+                <span class="tip-icon">📚</span>
+                <h4>Descripción Útil</h4>
+                <p>Incluye una sinopsis breve para que otros usuarios entiendan la película</p>
+            </div>
+        </div>
+    </section>
+</section>
+
+<script>
+    // Live Preview Update
+    const form = document.getElementById('addMovieForm');
+    const titleInput = document.getElementById('title');
+    const yearInput = document.getElementById('year');
+    const genreSelect = document.getElementById('genre');
+    const ratingInput = document.getElementById('rating');
+    const descInput = document.getElementById('description');
+    const charCount = document.getElementById('charCount');
+
+    const previewTitle = document.getElementById('previewTitle');
+    const previewYear = document.getElementById('previewYear');
+    const previewGenre = document.getElementById('previewGenre');
+    const previewRating = document.getElementById('previewRating');
+
+    const updatePreview = () => {
+        previewTitle.textContent = titleInput.value || 'Tu película aquí';
+        previewYear.textContent = yearInput.value ? `📅 ${yearInput.value}` : '📅 -';
+        previewGenre.textContent = genreSelect.value || '-';
+        previewRating.textContent = ratingInput.value || '-';
+    };
+
+    titleInput.addEventListener('input', updatePreview);
+    yearInput.addEventListener('input', updatePreview);
+    genreSelect.addEventListener('change', updatePreview);
+    ratingInput.addEventListener('input', updatePreview);
+
+    descInput.addEventListener('input', () => {
+        charCount.textContent = descInput.value.length;
+    });
+
+    // Form Validation
+    form.addEventListener('submit', (e) => {
+        const rating = parseFloat(ratingInput.value);
+        if (isNaN(rating) || rating < 0 || rating > 10) {
+            e.preventDefault();
+            alert('La puntuación debe estar entre 0 y 10');
+        }
+    });
+</script>
+{% endblock %}

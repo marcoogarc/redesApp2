@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Registro - CinemaHub{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-container">
+        <div class="auth-info">
+            <div class="auth-logo">
+                <span class="logo-icon-large">🎬</span>
+                <h1>CinemaHub</h1>
+            </div>
+            <h2>Crea tu cuenta</h2>
+            <p>Regístrate para guardar favoritos, valorar películas y recibir recomendaciones personalizadas.</p>
+            <div class="auth-benefits">
+                <div class="benefit">
+                    <span class="benefit-icon">✓</span>
+                    <span>Lista de favoritos persistente</span>
+                </div>
+                <div class="benefit">
+                    <span class="benefit-icon">✓</span>
+                    <span>Valoraciones que afectan al rating global</span>
+                </div>
+                <div class="benefit">
+                    <span class="benefit-icon">✓</span>
+                    <span>Acceso desde cualquier dispositivo</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-form-container">
+            <div class="auth-form-wrapper">
+                <h3 class="auth-form-title">Crear cuenta</h3>
+
+                {% if error %}
+                <div class="alert alert-error" role="alert">
+                    <span class="alert-icon">⚠️</span>
+                    <span>{{ error }}</span>
+                </div>
+                {% endif %}
+
+                <form method="POST" action="/{{ subpath }}/register" class="auth-form">
+                    <div class="form-group">
+                        <label for="username" class="form-label">
+                            <span class="label-text">Usuario</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">👤</span>
+                            <input type="text" id="username" name="username" class="form-input"
+                                   placeholder="Elige un nombre de usuario" required minlength="3" maxlength="100">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">
+                            <span class="label-text">Email</span>
+                            <span class="label-optional">(Opcional)</span>
+                        </label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">📧</span>
+                            <input type="email" id="email" name="email" class="form-input"
+                                   placeholder="tucorreo@ejemplo.com">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">
+                            <span class="label-text">Contraseña</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🔐</span>
+                            <input type="password" id="password" name="password" class="form-input"
+                                   placeholder="Mínimo 6 caracteres" required minlength="6">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password2" class="form-label">
+                            <span class="label-text">Repetir contraseña</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🔐</span>
+                            <input type="password" id="password2" name="password2" class="form-input"
+                                   placeholder="Repite la contraseña" required minlength="6">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-lg btn-primary btn-block">
+                        <span class="btn-icon">✨</span> Crear cuenta
+                    </button>
+                </form>
+
+                <div class="auth-divider">
+                    <span class="divider-text">o</span>
+                </div>
+
+                <div class="auth-alternatives">
+                    <p class="auth-alt-text">¿Ya tienes cuenta?</p>
+                    <div class="auth-alt-buttons">
+                        <a href="/{{ subpath }}/login" class="btn btn-secondary btn-block">
+                            <span>🔓</span> Iniciar sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

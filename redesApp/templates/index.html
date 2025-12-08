@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Catálogo de Películas - CinemaHub{% endblock %}
+
+{% block hero %}
+<section class="hero">
+    <div class="hero-content">
+        <h1 class="hero-title">Descubre Películas Extraordinarias</h1>
+        <p class="hero-subtitle">Explora nuestro extenso catálogo de películas y encuentra tu próxima favorita</p>
+        <div class="hero-stats">
+            <div class="stat">
+                <span class="stat-number">{{ movies|length }}</span>
+                <span class="stat-label">Películas</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">8+</span>
+                <span class="stat-label">Géneros</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">9.3★</span>
+                <span class="stat-label">Rating Promedio</span>
+            </div>
+        </div>
+    </div>
+    <div class="hero-background"></div>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="movies-section">
+    <div class="section-header">
+        <h2>Todas las Películas</h2>
+        <p class="section-description">Explora nuestro completo catálogo de películas clasificadas por género y puntuación</p>
+    </div>
+
+    {% if usuario %}
+    <div class="user-actions">
+        <a href="/{{ subpath }}/add" class="btn btn-lg btn-primary">
+            <span class="btn-icon">➕</span> Añadir Nueva Película
+        </a>
+        <a href="/{{ subpath }}/favoritos" class="btn btn-lg btn-secondary">
+            <span class="btn-icon">❤️</span> Ver Mis Favoritos ({{ favoritos|length }})
+        </a>
+    </div>
+    {% endif %}
+
+    {% if movies %}
+        <div class="movies-grid">
+            {% for movie in movies %}
+            <article class="movie-card {% if not movie.poster_url %}no-poster{% endif %}" data-movie-id="{{ movie.id }}">
+                {% if movie.poster_url %}
+                <div class="movie-poster-wrapper">
+                    <img src="{{ movie.poster_url }}" alt="Póster {{ movie.title }}" class="movie-poster" loading="lazy">
+                </div>
+                {% endif %}
+                <!-- Card Header with Gradient -->
+                <div class="movie-header">
+                    <div class="movie-rating">
+                        <span class="rating-value">{{ movie.rating }}</span>
+                        <span class="rating-star">⭐</span>
+                    </div>
+                    <span class="movie-genre-badge">{{ movie.genre }}</span>
+                </div>
+
+                <!-- Card Body -->
+                <div class="movie-body">
+                    <h3 class="movie-title">
+                        <a href="/{{ subpath }}/movie/{{ movie.id }}">{{ movie.title }}</a>
+                    </h3>
+                    <p class="movie-year">📅 {{ movie.year }}</p>
+                    <div class="movie-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Género:</span>
+                            <span class="detail-value">{{ movie.genre }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Año:</span>
+                            <span class="detail-value">{{ movie.year }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Rating:</span>
+                            <div class="rating-bar">
+                                <div class="rating-fill" style="width: {{ movie.rating * 10 }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Footer with Actions -->
+                <div class="movie-footer">
+                    <div class="movie-actions">
+                        <a href="/{{ subpath }}/recomendaciones/{{ movie.id }}" class="btn btn-sm btn-info" title="Ver películas similares">
+                            <span>🎯</span> Similar
+                        </a>
+                        
+                        {% if usuario %}
+                            {% if movie.id in favoritos %}
+                                <a href="/{{ subpath }}/remove_favorito/{{ movie.id }}" class="btn btn-sm btn-danger active" title="Quitar de favoritos">
+                                    <span>❌</span> Favorito
+                                </a>
+                            {% else %}
+                                <a href="/{{ subpath }}/add_favorito/{{ movie.id }}" class="btn btn-sm btn-success" title="Añadir a favoritos">
+                                    <span>❤️</span> Añadir
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <span class="btn btn-sm btn-disabled" title="Inicia sesión para usar favoritos">
+                                <span>🔒</span> Login
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Hover Overlay -->
+                <div class="card-overlay">
+                    <div class="overlay-content">
+                        <h4>{{ movie.title }}</h4>
+                        <p class="overlay-info">{{ movie.genre }} • {{ movie.year }}</p>
+                        <a href="/{{ subpath }}/recomendaciones/{{ movie.id }}" class="btn btn-sm btn-primary">
+                            Ver Recomendaciones
+                        </a>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🎬</div>
+            <h3>No hay películas disponibles</h3>
+            <p>Parece que el catálogo está vacío. {% if usuario %}<a href="/{{ subpath }}/add">¡Sé el primero en añadir una!</a>{% else %}<a href="/{{ subpath }}/login">Inicia sesión</a> para contribuir.{% endif %}</p>
+        </div>
+    {% endif %}
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <h2>¿Por qué usar CinemaHub?</h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3>Búsqueda Avanzada</h3>
+            <p>Encuentra películas fácilmente por género, título y otras características</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <h3>Recomendaciones Inteligentes</h3>
+            <p>Sistema automático que sugiere películas similares basado en géneros y puntuaciones</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">❤️</div>
+            <h3>Guarda Favoritos</h3>
+            <p>Crea tu lista personal de películas favoritas y accede desde cualquier lugar</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">👥</div>
+            <h3>Comunidad Activa</h3>
+            <p>Contribuye con nuevas películas y comparte tus descubrimientos</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

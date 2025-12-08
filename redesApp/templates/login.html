@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Iniciar Sesión - CinemaHub{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-container">
+        <!-- Left Side - Brand Info -->
+        <div class="auth-info">
+            <div class="auth-logo">
+                <span class="logo-icon-large">🎬</span>
+                <h1>CinemaHub</h1>
+            </div>
+            <h2>Bienvenido de Nuevo</h2>
+            <p>Accede a tu cuenta para disfrutar de todas las funcionalidades de CinemaHub</p>
+            <div class="auth-benefits">
+                <div class="benefit">
+                    <span class="benefit-icon">✓</span>
+                    <span>Guarda tus películas favoritas</span>
+                </div>
+                <div class="benefit">
+                    <span class="benefit-icon">✓</span>
+                    <span>Obtén recomendaciones personalizadas</span>
+                </div>
+                <div class="benefit">
+                    <span class="benefit-icon">✓</span>
+                    <span>Añade películas al catálogo</span>
+                </div>
+                <div class="benefit">
+                    <span class="benefit-icon">✓</span>
+                    <span>Acceso a tu perfil personalizado</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Login Form -->
+        <div class="auth-form-container">
+            <div class="auth-form-wrapper">
+                <h3 class="auth-form-title">Iniciar Sesión</h3>
+
+                {% if error %}
+                <div class="alert alert-error" role="alert">
+                    <span class="alert-icon">⚠️</span>
+                    <span>{{ error }}</span>
+                </div>
+                {% endif %}
+
+                <form method="POST" action="/{{ subpath }}/login" class="auth-form">
+                    <div class="form-group">
+                        <label for="username" class="form-label">
+                            <span class="label-text">Usuario o Email</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">👤</span>
+                            <input 
+                                type="text" 
+                                id="username" 
+                                name="username" 
+                                class="form-input"
+                                placeholder="Ingresa tu usuario"
+                                required
+                                autocomplete="username"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">
+                            <span class="label-text">Contraseña</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🔐</span>
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                class="form-input"
+                                placeholder="Ingresa tu contraseña"
+                                required
+                                autocomplete="current-password"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="remember" class="checkbox-input">
+                            <span class="checkbox-text">Recuérdame en este dispositivo</span>
+                        </label>
+                        <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-lg btn-primary btn-block">
+                        <span class="btn-icon">🔓</span> Acceder a CinemaHub
+                    </button>
+                </form>
+
+                <div class="auth-divider">
+                    <span class="divider-text">o</span>
+                </div>
+
+                <div class="auth-alternatives">
+                    <p class="auth-alt-text">¿No tienes cuenta?</p>
+                    <div class="auth-alt-buttons">
+                        <button class="btn btn-secondary btn-block" onclick="alert('Registro en desarrollo')">
+                            <span>✨</span> Crear Cuenta Gratuita
+                        </button>
+                    </div>
+                </div>
+
+                <div class="auth-info-box">
+                    <p><strong>Demo:</strong> Puedes usar cualquier usuario y contraseña para acceder</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

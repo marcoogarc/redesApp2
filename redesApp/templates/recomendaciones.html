@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Películas Similares - CinemaHub{% endblock %}
+
+{% block content %}
+<section class="recommendations-section">
+    {% if movie %}
+        <!-- Featured Movie -->
+        <div class="featured-movie">
+            <div class="featured-content">
+                <div class="featured-header">
+                    <h2>Películas Similares a:</h2>
+                    <h1 class="featured-title">{{ movie.title }}</h1>
+                </div>
+
+                <div class="featured-info">
+                    <div class="info-badge">
+                        <span class="badge-icon">🎭</span>
+                        <span class="badge-text">{{ movie.genre }}</span>
+                    </div>
+                    <div class="info-badge">
+                        <span class="badge-icon">📅</span>
+                        <span class="badge-text">{{ movie.year }}</span>
+                    </div>
+                    <div class="info-badge">
+                        <span class="badge-icon">⭐</span>
+                        <span class="badge-text">{{ movie.rating }}/10</span>
+                    </div>
+                </div>
+
+                <p class="featured-description">
+                    Hemos seleccionado películas similares por género y puntuación. Si te gustó <strong>{{ movie.title }}</strong>, 
+                    probablemente disfrutarás estas opciones.
+                </p>
+            </div>
+        </div>
+
+        <!-- Recommendations Section -->
+        {% if recomendadas %}
+            <div class="recommendations-header">
+                <h3>Películas Recomendadas</h3>
+                <p>{{ recomendadas|length }} película{{ 's' if recomendadas|length != 1 else '' }} encontrada{{ 's' if recomendadas|length != 1 else '' }} basada en género y puntuación</p>
+            </div>
+
+            <div class="movies-grid recommendations-grid">
+                {% for rec in recomendadas %}
+                <article class="movie-card recommendation-card {% if not rec.poster_url %}no-poster{% endif %}" data-movie-id="{{ rec.id }}">
+                    {% if rec.poster_url %}
+                    <div class="movie-poster-wrapper">
+                        <img src="{{ rec.poster_url }}" alt="Póster {{ rec.title }}" class="movie-poster" loading="lazy">
+                    </div>
+                    {% endif %}
+                    <div class="movie-header">
+                        <div class="movie-rating">
+                            <span class="rating-value">{{ rec.rating }}</span>
+                            <span class="rating-star">⭐</span>
+                        </div>
+                        <span class="movie-genre-badge">{{ rec.genre }}</span>
+                    </div>
+
+                    <div class="movie-body">
+                        <h3 class="movie-title">
+                            <a href="/{{ subpath }}/movie/{{ movie.id }}">{{ rec.title }}</a>
+                        </h3>
+                        <p class="movie-year">📅 {{ rec.year }}</p>
+                        <div class="movie-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Género:</span>
+                                <span class="detail-value">{{ rec.genre }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Año:</span>
+                                <span class="detail-value">{{ rec.year }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Rating:</span>
+                                <div class="rating-bar">
+                                    <div class="rating-fill" style="width: {{ rec.rating * 10 }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="match-indicator">
+                            <span class="match-label">Compatibilidad:</span>
+                            <div class="match-bar">
+                                <div class="match-fill" style="width: {{ (100 - (rec.rating - movie.rating)|abs * 20) }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="movie-footer">
+                        <div class="movie-actions">
+                            <a href="/{{ subpath }}/recomendaciones/{{ rec.id }}" class="btn btn-sm btn-info" title="Ver más recomendaciones">
+                                <span>🔄</span>
+                            </a>
+                            
+                            {% if usuario %}
+                                {% if rec.id in favoritos %}
+                                    <a href="/{{ subpath }}/remove_favorito/{{ rec.id }}" class="btn btn-sm btn-danger active" title="Quitar de favoritos">
+                                        <span>❌</span>
+                                    </a>
+                                {% else %}
+                                    <a href="/{{ subpath }}/add_favorito/{{ rec.id }}" class="btn btn-sm btn-success" title="Añadir a favoritos">
+                                        <span>❤️</span>
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                <span class="btn btn-sm btn-disabled" title="Inicia sesión">
+                                    <span>🔒</span>
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="card-overlay">
+                        <div class="overlay-content">
+                            <h4>{{ rec.title }}</h4>
+                            <p class="overlay-info">{{ rec.genre }} • {{ rec.year }} • ⭐ {{ rec.rating }}/10</p>
+                            <a href="/{{ subpath }}/recomendaciones/{{ rec.id }}" class="btn btn-sm btn-primary">
+                                Ver Similares
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-recommendations">
+                <div class="empty-icon">🎯</div>
+                <h3>No hay recomendaciones disponibles</h3>
+                <p>No encontramos películas del género <strong>{{ movie.genre }}</strong> con una puntuación similar a {{ movie.rating }}/10</p>
+                <p>Intenta explorar más películas en el catálogo o ajusta los filtros.</p>
+            </div>
+        {% endif %}
+
+        <!-- Navigation -->
+        <div class="recommendations-navigation">
+            <a href="/{{ subpath }}/" class="btn btn-lg btn-secondary">
+                <span>🏠</span> Volver al Inicio
+            </a>
+            <a href="/{{ subpath }}/search" class="btn btn-lg btn-secondary">
+                <span>🔍</span> Buscar Más
+            </a>
+        </div>
+
+    {% else %}
+        <div class="empty-state empty-recommendation">
+            <div class="empty-icon">❌</div>
+            <h3>Película no encontrada</h3>
+            <p>La película que buscas no está disponible en nuestro catálogo.</p>
+            <a href="/{{ subpath }}/" class="btn btn-lg btn-primary">
+                <span>🎬</span> Ver Catálogo Completo
+            </a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

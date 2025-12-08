@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Buscar Películas - CinemaHub{% endblock %}
+
+{% block content %}
+<section class="search-section">
+    <div class="search-header">
+        <h2>Buscar Películas</h2>
+        <p>Encuentra películas por género o título</p>
+    </div>
+
+    <!-- Advanced Search Form -->
+    <div class="search-form-container">
+        <form method="POST" action="/{{ subpath }}/search" class="advanced-search-form" id="searchForm">
+            <div class="search-row">
+                <div class="search-group">
+                    <label for="query_type" class="search-label">Buscar por:</label>
+                    <div class="select-wrapper">
+                        <select id="query_type" name="query_type" class="search-select">
+                            <option value="genre" {% if query_type == 'genre' %}selected{% endif %}>🎭 Género</option>
+                            <option value="title" {% if query_type == 'title' %}selected{% endif %}>🎬 Título</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="search-group flex-grow">
+                    <label for="query_value" class="search-label">Término de búsqueda:</label>
+                    <div class="input-wrapper-search">
+                        <span class="search-icon">🔍</span>
+                        <input 
+                            type="text" 
+                            id="query_value" 
+                            name="query_value" 
+                            class="search-input"
+                            placeholder="Escribe para buscar..."
+                            value="{{ query_value or '' }}"
+                            required
+                        >
+                        {% if query_value %}
+                        <button type="reset" class="search-clear" title="Limpiar búsqueda">✕</button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-search">
+                    <span>🔎</span> Buscar
+                </button>
+            </div>
+
+            <!-- Search Tips -->
+            <div class="search-tips">
+                <small>💡 Tip: Intenta buscar por "Action", "Drama", "Sci-Fi" o nombres de películas</small>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Section -->
+    <section class="search-results">
+        {% if movies %}
+            <div class="results-header">
+                <h3>Resultados de Búsqueda</h3>
+                <span class="results-count">{{ movies|length }} película{{ 's' if movies|length != 1 else '' }} encontrada{{ 's' if movies|length != 1 else '' }}</span>
+            </div>
+            <div class="movies-grid search-results-grid">
+                {% for movie in movies %}
+                <article class="movie-card {% if not movie.poster_url %}no-poster{% endif %}" data-movie-id="{{ movie.id }}">
+                    {% if movie.poster_url %}
+                    <div class="movie-poster-wrapper">
+                        <img src="{{ movie.poster_url }}" alt="Póster {{ movie.title }}" class="movie-poster" loading="lazy">
+                    </div>
+                    {% endif %}
+                    <div class="movie-header">
+                        <div class="movie-rating">
+                            <span class="rating-value">{{ movie.rating }}</span>
+                            <span class="rating-star">⭐</span>
+                        </div>
+                        <span class="movie-genre-badge">{{ movie.genre }}</span>
+                    </div>
+
+                    <div class="movie-body">
+                        <h4 class="movie-title">
+                            <a href="/{{ subpath }}/movie/{{ movie.id }}">{{ movie.title }}</a>
+                        </h4>
+                        <p class="movie-year">📅 {{ movie.year }}</p>
+                        <div class="movie-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Género:</span>
+                                <span class="detail-value">{{ movie.genre }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Rating:</span>
+                                <div class="rating-bar">
+                                    <div class="rating-fill" style="width: {{ movie.rating * 10 }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="movie-footer">
+                        <div class="movie-actions">
+                            <a href="/{{ subpath }}/recomendaciones/{{ movie.id }}" class="btn btn-sm btn-info" title="Ver películas similares">
+                                <span>🎯</span>
+                            </a>
+                            
+                            {% if usuario %}
+                                {% if movie.id in favoritos %}
+                                    <a href="/{{ subpath }}/remove_favorito/{{ movie.id }}" class="btn btn-sm btn-danger active" title="Quitar de favoritos">
+                                        <span>❌</span>
+                                    </a>
+                                {% else %}
+                                    <a href="/{{ subpath }}/add_favorito/{{ movie.id }}" class="btn btn-sm btn-success" title="Añadir a favoritos">
+                                        <span>❤️</span>
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                <span class="btn btn-sm btn-disabled" title="Inicia sesión">
+                                    <span>🔒</span>
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="card-overlay">
+                        <div class="overlay-content">
+                            <h5>{{ movie.title }}</h5>
+                            <p class="overlay-info">{{ movie.genre }} • {{ movie.year }}</p>
+                            <a href="/{{ subpath }}/movie/{{ movie.id }}" class="btn btn-sm btn-primary">
+                                Ver detalle
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        {% elif query_value %}
+            <div class="empty-search-state">
+                <div class="empty-icon">🎬</div>
+                <h3>No se encontraron películas</h3>
+                <p>Intenta con otro término de búsqueda o {% if usuario %}<a href="/{{ subpath }}/add">añade una película</a>{% else %}<a href="/{{ subpath }}/login">inicia sesión</a>{% endif %}</p>
+            </div>
+        {% else %}
+            <div class="search-empty">
+                <div class="empty-icon">🔍</div>
+                <h3>Comienza tu búsqueda</h3>
+                <p>Usa el formulario arriba para buscar películas por género o título</p>
+            </div>
+        {% endif %}
+    </section>
+
+    <!-- Popular Searches Section -->
+    <section class="popular-searches">
+        <h3>Búsquedas Populares</h3>
+        <div class="search-tags">
+            <form method="POST" action="/{{ subpath }}/search" style="display: inline;">
+                <input type="hidden" name="query_type" value="genre">
+                <button type="submit" name="query_value" value="Action" class="search-tag">🎬 Action</button>
+            </form>
+            <form method="POST" action="/{{ subpath }}/search" style="display: inline;">
+                <input type="hidden" name="query_type" value="genre">
+                <button type="submit" name="query_value" value="Drama" class="search-tag">🎭 Drama</button>
+            </form>
+            <form method="POST" action="/{{ subpath }}/search" style="display: inline;">
+                <input type="hidden" name="query_type" value="genre">
+                <button type="submit" name="query_value" value="Sci-Fi" class="search-tag">🚀 Sci-Fi</button>
+            </form>
+            <form method="POST" action="/{{ subpath }}/search" style="display: inline;">
+                <input type="hidden" name="query_type" value="genre">
+                <button type="submit" name="query_value" value="Comedy" class="search-tag">😂 Comedy</button>
+            </form>
+            <form method="POST" action="/{{ subpath }}/search" style="display: inline;">
+                <input type="hidden" name="query_type" value="genre">
+                <button type="submit" name="query_value" value="Horror" class="search-tag">👻 Horror</button>
+            </form>
+        </div>
+    </section>
+</section>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}{{ movie.title if movie }} - Detalle{% endblock %}
+
+{% block content %}
+<section class="recommendations-section">
+    {% if movie %}
+        <div class="featured-movie">
+            <div class="featured-content">
+                <div class="featured-header">
+                    <h2>Detalle de película</h2>
+                    <h1 class="featured-title">{{ movie.title }}</h1>
+                </div>
+
+                <div class="featured-info">
+                    <div class="info-badge">
+                        <span class="badge-icon">🎭</span>
+                        <span class="badge-text">{{ movie.genre }}</span>
+                    </div>
+                    <div class="info-badge">
+                        <span class="badge-icon">📅</span>
+                        <span class="badge-text">{{ movie.year }}</span>
+                    </div>
+                    <div class="info-badge">
+                        <span class="badge-icon">⭐</span>
+                        <span class="badge-text">{{ movie.rating }}/10</span>
+                    </div>
+                </div>
+
+                {% if movie.description %}
+                    <p class="featured-description">
+                        {{ movie.description }}
+                    </p>
+                {% endif %}
+                {% if usuario %}
+                <section class="help-section">
+                    <h3>Tu valoración</h3>
+                    <form method="POST" action="/{{ subpath }}/rate/{{ movie.id }}" class="movie-form" style="max-width:400px;margin:0 auto;">
+                        <div class="form-group">
+                            <label for="rating" class="form-label">
+                                <span class="label-text">Puntuación (0-10)</span>
+                                <span class="label-required">*</span>
+                            </label>
+                            <div class="rating-input-wrapper">
+                                <input type="number" id="rating" name="rating" class="form-input rating-input"
+                                    min="0" max="10" step="0.1" required>
+                                <span class="rating-max">/10</span>
+                            </div>
+                            <span class="form-help">Tu voto se usará para el rating global de esta película.</span>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg btn-block">
+                            <span class="btn-icon">⭐</span> Guardar mi voto
+                        </button>
+                    </form>
+                </section>
+                {% else %}
+                <section class="help-section">
+                    <p class="text-center text-secondary">
+                        Inicia sesión para valorar esta película.
+                    </p>
+                </section>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="recommendations-navigation">
+            <a href="/{{ subpath }}/recomendaciones/{{ movie.id }}" class="btn btn-lg btn-info">
+                <span>🎯</span> Ver similares
+            </a>
+
+            {% if usuario %}
+                {% if movie.id in favoritos %}
+                    <a href="/{{ subpath }}/remove_favorito/{{ movie.id }}" class="btn btn-lg btn-danger">
+                        <span>❌</span> Quitar de favoritos
+                    </a>
+                {% else %}
+                    <a href="/{{ subpath }}/add_favorito/{{ movie.id }}" class="btn btn-lg btn-success">
+                        <span>❤️</span> Añadir a favoritos
+                    </a>
+                {% endif %}
+            {% else %}
+                <span class="btn btn-lg btn-disabled">
+                    <span>🔒</span> Inicia sesión para gestionar favoritos
+                </span>
+            {% endif %}
+
+            <a href="/{{ subpath }}/" class="btn btn-lg btn-secondary">
+                <span>🏠</span> Volver al inicio
+            </a>
+        </div>
+    {% else %}
+        <div class="empty-state empty-recommendation">
+            <div class="empty-icon">❌</div>
+            <h3>Película no encontrada</h3>
+            <p>La película que buscas no está disponible en nuestro catálogo.</p>
+            <a href="/{{ subpath }}/" class="btn btn-lg btn-primary">
+                <span>🎬</span> Ver Catálogo Completo
+            </a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}
