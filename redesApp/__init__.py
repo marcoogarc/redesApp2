@@ -9,7 +9,7 @@ import hashlib
 import base64
 from config import FREEPIK_API_KEY, FREEPIK_WEBHOOK_SECRET
 
-app = Flask("Movies")
+app = Flask(__name__)
 app.config["SECRET_KEY"] = config.SECRET_KEY
 app.config["SESSION_TYPE"] = config.SESSION_TYPE
 
