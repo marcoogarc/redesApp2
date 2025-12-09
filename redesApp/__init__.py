@@ -121,8 +121,14 @@ def start_mystic_poster_task(title, genre):
 def index():
     """Página principal con listado de películas"""
     usuario = session.get("usuario")
+    user_data = None
     try:
         with engine.connect() as conn:
+            if usuario:
+                # Obtener datos del usuario (incluyendo puntos y nivel)
+                result_user = conn.execute(text("SELECT id, points, level FROM users WHERE username = :u"), {"u": usuario})
+                user_data = result_user.fetchone()
+
             result = conn.execute(text("""
                 SELECT m.id,
                        m.title,
@@ -142,7 +148,14 @@ def index():
         print(f"Error al obtener películas: {e}")
     
     favoritos = session.get("favoritos", [])
-    return render_template("index.html", movies=movies, usuario=usuario, favoritos=favoritos, subpath=subpath)
+    return render_template(
+        "index.html",
+        movies=movies,
+        usuario=usuario,
+        user_data=user_data,
+        favoritos=favoritos,
+        subpath=subpath
+    )
 
 @app.route(f"/{subpath}/login", methods=["GET", "POST"])
 def login():
@@ -251,9 +264,22 @@ def add_movie():
                         "t": title, "g": genre, "y": int(year), "r": float(rating), "d": description
                     })
                     movie_id = result.lastrowid
+
+                    # 2. Otorgar puntos al usuario
+                    user_res = conn.execute(text("SELECT id, points, level FROM users WHERE username = :u"), {"u": usuario})
+                    user_data = user_res.fetchone()
+                    if user_data:
+                        new_points = user_data.points + 10
+                        new_level = user_data.level
+                        if new_points >= new_level * 100:
+                            new_level += 1
+                        conn.execute(text("""
+                            UPDATE users SET points = :p, level = :l WHERE id = :uid
+                        """), {"p": new_points, "l": new_level, "uid": user_data.id})
+
                     conn.commit()
 
-                    # 2. Lanzar generación de póster AI (asíncrono)
+                    # 3. Lanzar generación de póster AI (asíncrono)
                     task_id = start_mystic_poster_task(title, genre)
                     if task_id:
                         conn.execute(text("""

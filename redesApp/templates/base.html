@@ -60,6 +60,19 @@
                                 <span class="dropdown-arrow">▼</span>
                             </button>
                             <ul class="dropdown-menu">
+                                {% if user_data %}
+                                <li class="dropdown-item-static">
+                                    <div class="user-level">
+                                        <span>Nivel {{ user_data.level }}</span>
+                                    </div>
+                                    <div class="user-points">
+                                        <span>{{ user_data.points }} Puntos</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress" style="width: {{ (user_data.points % 100) }}%;"></div>
+                                    </div>
+                                </li>
+                                {% endif %}
                                 <li>
                                     <a href="/{{ subpath }}/logout" class="dropdown-item">
                                         <i class="icon">🚪</i> Cerrar Sesión
