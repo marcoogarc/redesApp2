@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='static/css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' fill='%23e50914'>🎬</text></svg>">
 </head>
 <body>
@@ -60,6 +60,19 @@
                                 <span class="dropdown-arrow">▼</span>
                             </button>
                             <ul class="dropdown-menu">
+                                {% if user_data %}
+                                <li class="dropdown-item-static">
+                                    <div class="user-level">
+                                        <span>Nivel {{ user_data.level }}</span>
+                                    </div>
+                                    <div class="user-points">
+                                        <span>{{ user_data.points }} Puntos</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress" style="width: {{ (user_data.points % 100) }}%;"></div>
+                                    </div>
+                                </li>
+                                {% endif %}
                                 <li>
                                     <a href="/{{ subpath }}/logout" class="dropdown-item">
                                         <i class="icon">🚪</i> Cerrar Sesión

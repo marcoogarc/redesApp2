@@ -58,6 +58,7 @@
                     <div class="movie-rating">
                         <span class="rating-value">{{ movie.rating }}</span>
                         <span class="rating-star">⭐</span>
+                        <span class="rating-count">({{ movie.rating_count if movie.rating_count is not none else 0 }} votos)</span>
                     </div>
                     <span class="movie-genre-badge">{{ movie.genre }}</span>
                 </div>
@@ -157,6 +158,20 @@
             <h3>Comunidad Activa</h3>
             <p>Contribuye con nuevas películas y comparte tus descubrimientos</p>
         </div>
+    </div>
+</section>
+
+<!-- Gamification Section -->
+<section class="gamification-section">
+    <div class="section-header">
+        <h2>¡Conviértete en un experto de cine!</h2>
+        <p class="section-description">Gana puntos y sube de nivel añadiendo nuevas películas a nuestro catálogo.</p>
+    </div>
+    <div class="gamification-cta">
+        <a href="/{{ subpath }}/add" class="btn btn-lg btn-primary">
+            <span class="btn-icon">➕</span> Añadir una película y ganar 10 puntos
+        </a>
+        <p class="gamification-info">¡Cada 100 puntos, subirás de nivel y desbloquearás nuevas recompensas!</p>
     </div>
 </section>
 {% endblock %}
