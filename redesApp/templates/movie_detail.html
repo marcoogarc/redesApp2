@@ -33,26 +33,38 @@
                     </p>
                 {% endif %}
                 {% if usuario %}
-                <section class="help-section">
-                    <h3>Tu valoración</h3>
-                    <form method="POST" action="/{{ subpath }}/rate/{{ movie.id }}" class="movie-form" style="max-width:400px;margin:0 auto;">
-                        <div class="form-group">
-                            <label for="rating" class="form-label">
-                                <span class="label-text">Puntuación (0-10)</span>
-                                <span class="label-required">*</span>
-                            </label>
-                            <div class="rating-input-wrapper">
-                                <input type="number" id="rating" name="rating" class="form-input rating-input"
-                                    min="0" max="10" step="0.1" required>
-                                <span class="rating-max">/10</span>
+                    {% if has_rated %}
+                    <section class="help-section">
+                        <h3>Ya has valorado esta película</h3>
+                        <p class="text-center text-secondary">Gracias por tu contribución.</p>
+                    </section>
+                    {% else %}
+                    <section class="help-section">
+                        <h3>Tu valoración</h3>
+                        <form method="POST" action="/{{ subpath }}/rate/{{ movie.id }}" class="movie-form" style="max-width:400px;margin:0 auto;">
+                            <div class="form-group">
+                                <label for="rating" class="form-label">
+                                    <span class="label-text">Puntuación (0-10)</span>
+                                    <span class="label-required">*</span>
+                                </label>
+                                <div class="rating-input-wrapper">
+                                    <input type="number" id="rating" name="rating" class="form-input rating-input"
+                                        min="0" max="10" step="0.1" required>
+                                    <span class="rating-max">/10</span>
+                                </div>
                             </div>
-                            <span class="form-help">Tu voto se usará para el rating global de esta película.</span>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-lg btn-block">
-                            <span class="btn-icon">⭐</span> Guardar mi voto
-                        </button>
-                    </form>
-                </section>
+                            <div class="form-group">
+                                <label for="comment" class="form-label">
+                                    <span class="label-text">Comentario (opcional)</span>
+                                </label>
+                                <textarea id="comment" name="comment" class="form-input" rows="3" placeholder="Escribe tu reseña aquí..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg btn-block">
+                                <span class="btn-icon">⭐</span> Guardar mi voto
+                            </button>
+                        </form>
+                    </section>
+                    {% endif %}
                 {% else %}
                 <section class="help-section">
                     <p class="text-center text-secondary">
@@ -99,4 +111,25 @@
         </div>
     {% endif %}
 </section>
+
+<!-- Sección de Comentarios -->
+{% if movie and comments %}
+<section class="comments-section">
+    <h2 style="font-family: var(--font-display); text-align: center; margin-bottom: 2rem;">Comentarios de la Comunidad</h2>
+    <div class="comments-list" style="display: flex; flex-direction: column; gap: 1rem;">
+        {% for comment in comments %}
+        <article class="comment-card" style="background-color: var(--surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem;">
+            <div class="comment-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <span class="comment-author" style="font-weight: bold; color: var(--text-primary);">{{ comment.username }}</span>
+                <span class="comment-rating" style="color: var(--accent); font-weight: bold;">{{ comment.rating }}⭐</span>
+                <span class="comment-date" style="color: var(--text-secondary); font-size: 0.8rem;">{{ comment.created_at.strftime('%Y-%m-%d') }}</span>
+            </div>
+            <div class="comment-body">
+                <p style="color: var(--text-secondary);">{{ comment.comment }}</p>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
 {% endblock %}

@@ -134,7 +134,8 @@ def index():
                        m.title,
                        m.genre,
                        m.year,
-                       COALESCE(AVG(r.rating), m.rating) AS rating,
+                       ROUND(COALESCE(AVG(r.rating), m.rating), 1) AS rating,
+                       COUNT(r.id) AS rating_count,
                        m.poster_url,
                        m.poster_task_id
                 FROM movies m
@@ -374,19 +375,51 @@ def favoritos():
 def movie_detail(movie_id):
     usuario = session.get("usuario")
     favoritos = session.get("favoritos", [])
+    comments = []
+    movie = None
+    has_rated = False
+
     try:
         with engine.connect() as conn:
+            user_id = None
+            if usuario:
+                result_user = conn.execute(text("SELECT id FROM users WHERE username = :u"), {"u": usuario})
+                user_row = result_user.fetchone()
+                if user_row:
+                    user_id = user_row.id
+
             result = conn.execute(text("""
-                SELECT m.id, m.title, m.genre, m.year, m.rating, m.description,
+                SELECT m.id, m.title, m.genre, m.year, m.description,
+                       ROUND(COALESCE(AVG(r.rating), m.rating), 1) AS rating,
+                       COUNT(r.id) AS rating_count,
                        m.poster_url, m.poster_task_id
                 FROM movies m
+                LEFT JOIN ratings r ON r.movie_id = m.id
                 WHERE m.id = :id
+                GROUP BY m.id
             """), {"id": movie_id})
             row = result.fetchone()
+
             if not row:
                 movie = None
             else:
                 movie = dict(row._mapping)
+                result_comments = conn.execute(text("""
+                    SELECT r.rating, r.comment, u.username, r.created_at
+                    FROM ratings r
+                    JOIN users u ON u.id = r.user_id
+                    WHERE r.movie_id = :id AND r.comment IS NOT NULL AND r.comment != ''
+                    ORDER BY r.created_at DESC
+                """), {"id": movie_id})
+                comments = [dict(row._mapping) for row in result_comments]
+
+                if user_id:
+                    result_rating = conn.execute(
+                        text("SELECT id FROM ratings WHERE user_id = :uid AND movie_id = :mid"),
+                        {"uid": user_id, "mid": movie_id}
+                    )
+                    if result_rating.fetchone():
+                        has_rated = True
     except Exception as e:
         print(f"Error obteniendo detalle de película: {e}")
         movie = None
@@ -394,8 +427,10 @@ def movie_detail(movie_id):
     return render_template(
         "movie_detail.html",
         movie=movie,
+        comments=comments,
         usuario=usuario,
         favoritos=favoritos,
+        has_rated=has_rated,
         subpath=subpath
     )
 
@@ -406,32 +441,32 @@ def rate_movie(movie_id):
         return redirect(f"/{subpath}/login")
 
     rating_str = request.form.get("rating", "").strip()
+    comment = request.form.get("comment", "").strip()
+
     try:
         rating_val = float(rating_str)
-    except ValueError:
-        return redirect(f"/{subpath}/movie/{movie_id}")
-
-    if rating_val < 0 or rating_val > 10:
+        if not (0 <= rating_val <= 10):
+            raise ValueError("Rating out of range")
+    except (ValueError, TypeError):
         return redirect(f"/{subpath}/movie/{movie_id}")
 
     try:
         with engine.connect() as conn:
-            # obtener id de usuario
-            result = conn.execute(
-                text("SELECT id FROM users WHERE username = :u"),
-                {"u": usuario}
-            )
+            result = conn.execute(text("SELECT id FROM users WHERE username = :u"), {"u": usuario})
             row = result.fetchone()
             if not row:
                 return redirect(f"/{subpath}/login")
-            user_id = row[0]
+            user_id = row.id
 
-            # insertar o actualizar voto
             conn.execute(text("""
-                INSERT INTO ratings (user_id, movie_id, rating)
-                VALUES (:uid, :mid, :r)
-                ON DUPLICATE KEY UPDATE rating = :r
-            """), {"uid": user_id, "mid": movie_id, "r": rating_val})
+                INSERT IGNORE INTO ratings (user_id, movie_id, rating, comment)
+                VALUES (:uid, :mid, :r, :c)
+            """), {
+                "uid": user_id,
+                "mid": movie_id,
+                "r": rating_val,
+                "c": comment or None
+            })
             conn.commit()
     except Exception as e:
         print(f"Error al guardar rating: {e}")
